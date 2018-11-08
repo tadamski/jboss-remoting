@@ -34,9 +34,10 @@ final class PendingChannel {
     private final int inboundMessageCount;
     private final long outboundMessageSize;
     private final long inboundMessageSize;
+    private final boolean noDispatch;
     private final Result<Channel> result;
 
-    PendingChannel(final int id, final int outboundWindowSize, final int inboundWindowSize, final int outboundMessageCount, final int inboundMessageCount, final long outboundMessageSize, final long inboundMessageSize, final Result<Channel> result) {
+    PendingChannel(final int id, final int outboundWindowSize, final int inboundWindowSize, final int outboundMessageCount, final int inboundMessageCount, final long outboundMessageSize, final long inboundMessageSize, final boolean noDispatch, final Result<Channel> result) {
         this.id = id;
         this.outboundWindowSize = outboundWindowSize;
         this.inboundWindowSize = inboundWindowSize;
@@ -44,6 +45,7 @@ final class PendingChannel {
         this.inboundMessageCount = inboundMessageCount;
         this.outboundMessageSize = outboundMessageSize;
         this.inboundMessageSize = inboundMessageSize;
+        this.noDispatch = noDispatch;
         this.result = result;
     }
 
@@ -74,6 +76,8 @@ final class PendingChannel {
     long getInboundMessageSize() {
         return inboundMessageSize;
     }
+
+    boolean isNoDispatch() { return noDispatch; }
 
     Result<Channel> getResult() {
         return result;

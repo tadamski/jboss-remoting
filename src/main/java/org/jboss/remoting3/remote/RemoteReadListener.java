@@ -392,6 +392,8 @@ final class RemoteReadListener implements ChannelListener<ConduitStreamSourceCha
                                 }
                             }
 
+                            boolean noDispatch = pendingChannel.isNoDispatch();
+
                             if (log.isTraceEnabled()) {
                                 log.tracef(
                                     "Inbound service acknowledgement for channel %08x is configured as follows:\n" +
@@ -400,18 +402,20 @@ final class RemoteReadListener implements ChannelListener<ConduitStreamSourceCha
                                     "  outbound msgs:    req %10d, use %10d\n" +
                                     "  inbound msgs:     req %10d, use %10d\n" +
                                     "  outbound msgsize: req %19d, use %19d\n" +
-                                    "  inbound msgsize:  req %19d, use %19d",
+                                    "  inbound msgsize:  req %19d, use %19d\n" +
+                                    "  no dispatch:      %b\n",
                                     Integer.valueOf(channelId),
                                     Integer.valueOf(requestedOutboundWindow), Integer.valueOf(outboundWindow),
                                     Integer.valueOf(requestedInboundWindow), Integer.valueOf(inboundWindow),
                                     Integer.valueOf(requestedOutboundMessageCount), Integer.valueOf(outboundMessageCount),
                                     Integer.valueOf(requestedInboundMessageCount), Integer.valueOf(inboundMessageCount),
                                     Long.valueOf(requestedOutboundMessageSize), Long.valueOf(outboundMessageSize),
-                                    Long.valueOf(requestedInboundMessageSize), Long.valueOf(inboundMessageSize)
+                                    Long.valueOf(requestedInboundMessageSize), Long.valueOf(inboundMessageSize),
+                                    noDispatch
                                 );
                             }
 
-                            RemoteConnectionChannel newChannel = new RemoteConnectionChannel(handler, connection, channelId, outboundWindow, inboundWindow, outboundMessageCount, inboundMessageCount, outboundMessageSize, inboundMessageSize);
+                            RemoteConnectionChannel newChannel = new RemoteConnectionChannel(handler, connection, channelId, outboundWindow, inboundWindow, outboundMessageCount, inboundMessageCount, outboundMessageSize, inboundMessageSize, noDispatch);
                             handler.putChannel(newChannel);
                             pendingChannel.getResult().setResult(newChannel);
                             break;

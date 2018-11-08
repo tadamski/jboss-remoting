@@ -319,6 +319,7 @@ final class Protocol {
     static final byte MSG_FLAG_EOF = 0x01;
     static final byte MSG_FLAG_NEW = 0x02;
     static final byte MSG_FLAG_CANCELLED = 0x04;
+    static final byte MSG_FLAG_NO_DISPATCH = 0x08;
 
     private Protocol() {
     }

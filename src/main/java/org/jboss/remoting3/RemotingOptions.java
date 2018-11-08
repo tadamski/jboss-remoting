@@ -296,6 +296,8 @@ public final class RemotingOptions {
      */
     public static final long DEFAULT_MAX_INBOUND_MESSAGE_SIZE = Long.MAX_VALUE;
 
+    public static final boolean DEFAULT_NO_DISPATCH = false;
+
     /**
      * The maximum outbound message size to send.  No messages larger than this well be transmitted; attempting to do
      * so will cause an exception on the writing side.
@@ -318,6 +320,8 @@ public final class RemotingOptions {
      * {@code Option} can be used to override this.
      */
     public static final Option<String> SASL_PROTOCOL = Option.simple(RemotingOptions.class, "SASL_PROTOCOL", String.class);
+
+    public static final Option<Boolean> NO_DISPATCH = Option.simple(RemotingOptions.class, "NO_DISPATCH", Boolean.class);
 
     /**
      * The default SASL protocol name.

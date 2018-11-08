@@ -322,6 +322,7 @@ final class RemoteConnectionHandler extends AbstractHandleableCloseable<Connecti
         // Request the maximum message size to defaults if none was specified.
         final long outboundMessageSizeOptionValue = connectionOptionMap.get(RemotingOptions.MAX_OUTBOUND_MESSAGE_SIZE, RemotingOptions.DEFAULT_MAX_OUTBOUND_MESSAGE_SIZE);
         final long inboundMessageSizeOptionValue = connectionOptionMap.get(RemotingOptions.MAX_INBOUND_MESSAGE_SIZE, RemotingOptions.DEFAULT_MAX_INBOUND_MESSAGE_SIZE);
+        final boolean noDispatchValue = connectionOptionMap.get(RemotingOptions.NO_DISPATCH, RemotingOptions.DEFAULT_NO_DISPATCH);
 
         final int outboundWindowSize = optionMap.get(RemotingOptions.TRANSMIT_WINDOW_SIZE, outboundWindowSizeOptionValue);
         final int outboundMessageCount = optionMap.get(RemotingOptions.MAX_OUTBOUND_MESSAGES, outboundMessageCountOptionValue);
@@ -329,6 +330,8 @@ final class RemoteConnectionHandler extends AbstractHandleableCloseable<Connecti
         final int inboundMessageCount = optionMap.get(RemotingOptions.MAX_INBOUND_MESSAGES, inboundMessageCountOptionValue);
         final long outboundMessageSize = optionMap.get(RemotingOptions.MAX_OUTBOUND_MESSAGE_SIZE, outboundMessageSizeOptionValue);
         final long inboundMessageSize = optionMap.get(RemotingOptions.MAX_INBOUND_MESSAGE_SIZE, inboundMessageSizeOptionValue);
+
+        final boolean noDispatch = optionMap.get(RemotingOptions.NO_DISPATCH, noDispatchValue);
 
         final IntIndexMap<PendingChannel> pendingChannels = this.pendingChannels;
         try {
@@ -343,7 +346,7 @@ final class RemoteConnectionHandler extends AbstractHandleableCloseable<Connecti
             for (;;) {
                 id = random.nextInt() | 0x80000000;
                 if (! pendingChannels.containsKey(id)) {
-                    PendingChannel pendingChannel = new PendingChannel(id, outboundWindowSize, inboundWindowSize, outboundMessageCount, inboundMessageCount, outboundMessageSize, inboundMessageSize, result);
+                    PendingChannel pendingChannel = new PendingChannel(id, outboundWindowSize, inboundWindowSize, outboundMessageCount, inboundMessageCount, outboundMessageSize, inboundMessageSize, noDispatch, result);
                     if (pendingChannels.putIfAbsent(pendingChannel) == null) {
                         if (log.isTraceEnabled()) {
                             log.tracef("Outbound service request for channel %08x is configured as follows:\n" +
@@ -352,14 +355,16 @@ final class RemoteConnectionHandler extends AbstractHandleableCloseable<Connecti
                                     "  outbound msgs:    option %10d, req %10d\n" +
                                     "  inbound msgs:     option %10d, req %10d\n" +
                                     "  outbound msgsize: option %19d, req %19d\n" +
-                                    "  inbound msgsize:  option %19d, req %19d",
+                                    "  inbound msgsize:  option %19d, req %19d\n" +
+                                    "  no dispatch:      %b\n",
                                 Integer.valueOf(id),
                                 Integer.valueOf(outboundWindowSizeOptionValue), Integer.valueOf(outboundWindowSize),
                                 Integer.valueOf(inboundWindowSizeOptionValue), Integer.valueOf(inboundWindowSize),
                                 Integer.valueOf(outboundMessageCountOptionValue), Integer.valueOf(outboundMessageCount),
                                 Integer.valueOf(inboundMessageCountOptionValue), Integer.valueOf(inboundMessageCount),
                                 Long.valueOf(outboundMessageSizeOptionValue), Long.valueOf(outboundMessageSize),
-                                Long.valueOf(inboundMessageSizeOptionValue), Long.valueOf(inboundMessageSize)
+                                Long.valueOf(inboundMessageSizeOptionValue), Long.valueOf(inboundMessageSize),
+                                noDispatch
                             );
                         }
                         if (anyAreSet(channelState, RECEIVED_CLOSE_REQ | SENT_CLOSE_REQ)) {
