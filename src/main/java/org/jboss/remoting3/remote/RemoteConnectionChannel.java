@@ -433,7 +433,8 @@ final class RemoteConnectionChannel extends AbstractHandleableCloseable<Channel>
                             final Receiver receiver = nextReceiver;
                             nextReceiver = null;
                             try {
-                                if(noDispatch){
+                                if (noDispatch) {
+                                    inboundMessage.handleIncoming(message);
                                     receiver.handleMessage(RemoteConnectionChannel.this, inboundMessage.messageInputStream);
                                 } else {
                                     getExecutor().execute(() -> receiver.handleMessage(RemoteConnectionChannel.this, inboundMessage.messageInputStream));
@@ -458,7 +459,7 @@ final class RemoteConnectionChannel extends AbstractHandleableCloseable<Channel>
                     return;
                 }
             }
-            inboundMessage.handleIncoming(message);
+            if(!noDispatch) inboundMessage.handleIncoming(message);
             ok1 = true;
         } finally {
             if (! ok1) message.free();

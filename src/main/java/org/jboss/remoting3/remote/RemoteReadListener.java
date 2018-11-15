@@ -184,6 +184,7 @@ final class RemoteReadListener implements ChannelListener<ConduitStreamSourceCha
                             final int inboundMessagesOptionValue = serviceOptionMap.get(RemotingOptions.MAX_INBOUND_MESSAGES, RemotingOptions.DEFAULT_MAX_INBOUND_MESSAGES);
                             final long outboundMessageSizeOptionValue = serviceOptionMap.get(RemotingOptions.MAX_OUTBOUND_MESSAGE_SIZE, RemotingOptions.DEFAULT_MAX_OUTBOUND_MESSAGE_SIZE);
                             final long inboundMessageSizeOptionValue = serviceOptionMap.get(RemotingOptions.MAX_INBOUND_MESSAGE_SIZE, RemotingOptions.DEFAULT_MAX_INBOUND_MESSAGE_SIZE);
+                            final boolean noDispatch = serviceOptionMap.get(RemotingOptions.NO_DISPATCH, RemotingOptions.DEFAULT_NO_DISPATCH);
 
                             final int outboundWindow = Math.min(requestedOutboundWindow, outboundWindowOptionValue);
                             final int outboundMessages = Math.min(requestedOutboundMessages, outboundMessagesOptionValue);
@@ -200,14 +201,16 @@ final class RemoteReadListener implements ChannelListener<ConduitStreamSourceCha
                                     "  outbound msgs:    req %10d, option %10d, grant %10d\n" +
                                     "  inbound msgs:     req %10d, option %10d, grant %10d\n" +
                                     "  outbound msgsize: req %19d, option %19d, grant %19d\n" +
-                                    "  inbound msgsize:  req %19d, option %19d, grant %19d",
+                                    "  inbound msgsize:  req %19d, option %19d, grant %19d\n" +
+                                    "  no dispatch:      %b\n",
                                     Integer.valueOf(channelId),
                                     Integer.valueOf(requestedOutboundWindow), Integer.valueOf(outboundWindowOptionValue), Integer.valueOf(outboundWindow),
                                     Integer.valueOf(requestedInboundWindow), Integer.valueOf(inboundWindowOptionValue), Integer.valueOf(inboundWindow),
                                     Integer.valueOf(requestedOutboundMessages), Integer.valueOf(outboundMessagesOptionValue), Integer.valueOf(outboundMessages),
                                     Integer.valueOf(requestedInboundMessages), Integer.valueOf(inboundMessagesOptionValue), Integer.valueOf(inboundMessages),
                                     Long.valueOf(requestedOutboundMessageSize), Long.valueOf(outboundMessageSizeOptionValue), Long.valueOf(outboundMessageSize),
-                                    Long.valueOf(requestedInboundMessageSize), Long.valueOf(inboundMessageSizeOptionValue), Long.valueOf(inboundMessageSize)
+                                    Long.valueOf(requestedInboundMessageSize), Long.valueOf(inboundMessageSizeOptionValue), Long.valueOf(inboundMessageSize),
+                                    noDispatch
                                 );
                             }
 
@@ -220,7 +223,7 @@ final class RemoteReadListener implements ChannelListener<ConduitStreamSourceCha
                             boolean ok1 = false;
                             try {
                                 // construct the channel
-                                RemoteConnectionChannel connectionChannel = new RemoteConnectionChannel(handler, connection, channelId, outboundWindow, inboundWindow, outboundMessages, inboundMessages, outboundMessageSize, inboundMessageSize);
+                                RemoteConnectionChannel connectionChannel = new RemoteConnectionChannel(handler, connection, channelId, outboundWindow, inboundWindow, outboundMessages, inboundMessages, outboundMessageSize, inboundMessageSize, noDispatch);
                                 RemoteConnectionChannel existing = handler.addChannel(connectionChannel);
                                 if (existing != null) {
                                     log.tracef("Encountered open request for duplicate %s", existing);
